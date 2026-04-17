@@ -1,138 +1,146 @@
 import streamlit as st
+import random
 import time
 
-# Конфигурация страницы
-st.set_page_config(page_title="Симулятор Миллионера 3.3", page_icon="💎", layout="wide")
+# Конфигурация
+st.set_page_config(page_title="Brawl Stars Case Simulator", page_icon="⭐", layout="wide")
 
-# --- СУПЕР ДИЗАЙН (CSS) ---
+# --- СТИЛЬ BRAWL STARS ---
 st.markdown("""
     <style>
     .stApp {
-        background: linear-gradient(135deg, #020111, #191970);
+        background: linear-gradient(135deg, #1e90ff, #1c1c1c);
         color: #ffffff;
     }
-    .money-card {
-        background: rgba(255, 255, 255, 0.07);
-        backdrop-filter: blur(20px);
-        border: 2px solid #FFD700;
-        border-radius: 25px;
-        padding: 25px;
-        text-align: center;
-        margin-bottom: 35px;
-        box-shadow: 0 10px 40px rgba(255, 215, 0, 0.2);
-    }
-    .money-text {
-        font-size: 75px;
-        font-weight: bold;
-        color: #FFD700;
-        text-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
-    }
-    .shop-item {
-        background: rgba(255, 255, 255, 0.05);
+    .lobby-card {
+        background: rgba(0, 0, 0, 0.6);
+        border: 4px solid #f1c40f;
         border-radius: 25px;
         padding: 20px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
         text-align: center;
-        transition: 0.4s ease;
+        box-shadow: 0 0 20px rgba(241, 196, 15, 0.4);
     }
-    .shop-item:hover {
-        transform: translateY(-10px);
-        border-color: #FFD700;
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
-    }
-    .item-img-container img {
-        border-radius: 15px;
-        height: 200px;
-        object-fit: cover;
-    }
-    .inv-box {
-        background: rgba(255, 215, 0, 0.1);
-        border-radius: 15px;
-        padding: 12px;
-        margin-bottom: 10px;
-        border-left: 6px solid #FFD700;
-        color: #FFD700;
+    .resource-text {
+        font-size: 24px;
         font-weight: bold;
+        color: #f1c40f;
+        text-shadow: 2px 2px 5px #000;
+    }
+    .brawler-card {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 10px;
+        border-radius: 15px;
+        margin-bottom: 5px;
+        border: 1px solid #555;
+        text-align: left;
+    }
+    .box-btn {
+        transition: 0.3s;
+    }
+    .box-btn:hover {
+        transform: scale(1.1);
     }
     </style>
     """, unsafe_allow_html=True)
 
-# --- ЛОГИКА ИГРЫ ---
-if 'money' not in st.session_state: st.session_state.money = 0
-if 'click' not in st.session_state: st.session_state.click = 250
-if 'income' not in st.session_state: st.session_state.income = 0
-if 'inventory' not in st.session_state: st.session_state.inventory = []
-if 'last_tick' not in st.session_state: st.session_state.last_tick = time.time()
+# --- ИНИЦИАЛИЗАЦИЯ ---
+if 'coins' not in st.session_state: st.session_state.coins = 100
+if 'gems' not in st.session_state: st.session_state.gems = 10
+if 'brawlers' not in st.session_state: st.session_state.brawlers = ["Shelly"]
+if 'last_reward' not in st.session_state: st.session_state.last_reward = ""
 
-# Авто-доход
-now = time.time()
-diff = int(now - st.session_state.last_tick)
-if diff >= 1:
-    st.session_state.money += diff * st.session_state.income
-    st.session_state.last_tick = now
+# Данные о ящиках
+BOXES = {
+    "Brawl Box": {"cost": 50, "gems_cost": 0, "img": "📦", "luck": ["El Primo", "Barley", "Poco", "Rosa"]},
+    "Big Box": {"cost": 200, "gems_cost": 0, "img": "🎁", "luck": ["Colt", "Bull", "Jessie", "Brock", "Dynamike"]},
+    "Mega Box": {"cost": 0, "gems_cost": 40, "img": "🔵", "luck": ["Piper", "Pam", "Frank", "Bibi", "Mortis", "Leon", "Crow", "Spike"]}
+}
 
-# --- ВЕРХНЯЯ ПАНЕЛЬ ---
-st.markdown(f"""
-    <div class='money-card'>
-        <div style='font-size: 20px; color: #ccc; letter-spacing: 3px;'>ВАШЕ СОСТОЯНИЕ</div>
-        <div class='money-text'>{st.session_state.money:,.0f} $</div>
-    </div>
-    """, unsafe_allow_html=True)
-
-col_work, col_shop = st.columns([1, 2.5])
-
-with col_work:
-    st.header("💼 Работа")
-    if st.button("РАБОТАТЬ 👷‍♂️", use_container_width=True):
-        st.session_state.money += st.session_state.click
-        st.rerun()
-    
-    st.success(f"Клик: +{st.session_state.click}$")
-    st.info(f"Доход: +{st.session_state.income}$/сек")
-    
-    st.write("---")
-    st.header("🏠 Мой Гараж")
-    if not st.session_state.inventory:
-        st.write("Гараж пока пуст...")
+# --- ФУНКЦИЯ ОТКРЫТИЯ ---
+def open_box(box_name):
+    box = BOXES[box_name]
+    if random.random() < 0.3: # 30% шанс на нового бравлера
+        new_brawler = random.choice(box["luck"])
+        if new_brawler not in st.session_state.brawlers:
+            st.session_state.brawlers.append(new_brawler)
+            st.session_state.last_reward = f"НОВЫЙ БРАВЛЕР: {new_brawler}! 🎉"
+            st.balloons()
+        else:
+            bonus_coins = random.randint(50, 150)
+            st.session_state.coins += bonus_coins
+            st.session_state.last_reward = f"Повторка {new_brawler}! Дали {bonus_coins} монет."
     else:
-        for item in st.session_state.inventory:
-            st.markdown(f"<div class='inv-box'>✔ {item}</div>", unsafe_allow_html=True)
+        bonus_coins = random.randint(20, 80)
+        st.session_state.coins += bonus_coins
+        st.session_state.last_reward = f"Выпало {bonus_coins} монет."
 
-with col_shop:
-    st.header("🏪 Элитный Рынок")
+# --- ЛОББИ ---
+st.title("⭐ Brawl Stars: Lobby & Case Simulator")
+
+# Панель ресурсов
+res_col1, res_col2, res_col3 = st.columns(3)
+with res_col1: st.markdown(f"<div class='resource-text'>💰 Монеты: {st.session_state.coins}</div>", unsafe_allow_html=True)
+with res_col2: st.markdown(f"<div class='resource-text'>💎 Гемы: {st.session_state.gems}</div>", unsafe_allow_html=True)
+with res_col3: st.markdown(f"<div class='resource-text'>👤 Бойцы: {len(st.session_state.brawlers)}</div>", unsafe_allow_html=True)
+
+st.write("---")
+
+col_main, col_inv = st.columns([2, 1])
+
+# --- ЦЕНТРАЛЬНОЕ ЛОББИ ---
+with col_main:
+    st.markdown("<div class='lobby-card'>", unsafe_allow_html=True)
+    st.image("https://images.unsplash.com/photo-1614036417651-efe591214972?w=500", caption="Brawl Stars Lobby")
+    st.write("### 🎁 Магазин ящиков")
     
-    # ПРОВЕРЕННЫЕ ССЫЛКИ НА РЕАЛЬНЫЕ МОДЕЛИ
-    items = [
-        {"name": "Chevrolet Spark", "price": 10500, "img": "https://raw.githubusercontent.com/a-shox/uzb_cars/main/spark.jpg", "inc": 0},
-        {"name": "Chevrolet Gentra", "price": 16500, "img": "https://raw.githubusercontent.com/a-shox/uzb_cars/main/gentra.jpg", "inc": 0},
-        {"name": "Chevrolet Malibu 2", "price": 35000, "img": "https://raw.githubusercontent.com/a-shox/uzb_cars/main/malibu.jpg", "inc": 0},
-        {"name": "Ресторан 'Milliy'", "price": 90000, "img": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=500", "inc": 350},
-        {"name": "Вилла в горах", "price": 300000, "img": "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=500", "inc": 1000},
-        {"name": "Tashkent City Center", "price": 1500000, "img": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=500", "inc": 5000}
-    ]
-
-    cols = st.columns(2)
-    for idx, item in enumerate(items):
-        with cols[idx % 2]:
-            st.markdown("<div class='shop-item'>", unsafe_allow_html=True)
-            # Отображаем картинку через st.image для надежности
-            st.image(item['img'], use_container_width=True)
-            st.markdown(f"<h3 style='color: #FFD700;'>{item['name']}</h3>", unsafe_allow_html=True)
-            st.write(f"Цена: **{item['price']:,} $**")
+    b1, b2, b3 = st.columns(3)
+    
+    with b1:
+        st.write("📦 **Brawl Box**")
+        if st.button("Открыть (50 💰)", key="b1"):
+            if st.session_state.coins >= 50:
+                st.session_state.coins -= 50
+                open_box("Brawl Box")
+                st.rerun()
+            else: st.error("Мало монет!")
             
-            if st.button(f"Купить {item['name']}", key=f"item_{idx}", use_container_width=True):
-                if st.session_state.money >= item['price']:
-                    st.session_state.money -= item['price']
-                    st.session_state.inventory.append(item['name'])
-                    st.session_state.income += item['inc']
-                    st.balloons()
-                    st.rerun()
-                else:
-                    st.error("Недостаточно денег!")
-            st.markdown("</div>", unsafe_allow_html=True)
+    with b2:
+        st.write("🎁 **Big Box**")
+        if st.button("Открыть (200 💰)", key="b2"):
+            if st.session_state.coins >= 200:
+                st.session_state.coins -= 200
+                open_box("Big Box")
+                st.rerun()
+            else: st.error("Мало монет!")
+
+    with b3:
+        st.write("🔵 **Mega Box**")
+        if st.button("Открыть (40 💎)", key="b3"):
+            if st.session_state.gems >= 40:
+                st.session_state.gems -= 40
+                open_box("Mega Box")
+                st.rerun()
+            else: st.error("Мало гемов!")
+    
+    st.markdown("</div>", unsafe_allow_html=True)
+    
+    if st.session_state.last_reward:
+        st.info(st.session_state.last_reward)
+
+    # Кнопка заработка
+    st.write("---")
+    if st.button("КЛИКАТЬ ДЛЯ ПОЛУЧЕНИЯ МОНЕТ ⚡", use_container_width=True):
+        st.session_state.coins += 10
+        if random.random() < 0.05: st.session_state.gems += 1
+        st.rerun()
+
+# --- СПИСОК БОЙЦОВ ---
+with col_inv:
+    st.header("👤 Мои Бойцы")
+    for b in st.session_state.brawlers:
+        st.markdown(f"<div class='brawler-card'>⭐ {b}</div>", unsafe_allow_html=True)
 
 # Сброс
-st.sidebar.markdown("### ⚙️ Настройки")
-if st.sidebar.button("Начать заново 🔄"):
+if st.sidebar.button("Сбросить аккаунт"):
     st.session_state.clear()
     st.rerun()
