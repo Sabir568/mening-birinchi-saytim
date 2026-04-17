@@ -3,56 +3,40 @@ import random
 import time
 import base64
 import json
+from datetime import datetime, timedelta
 
 # --- 1. CONFIGURATION ---
-st.set_page_config(page_title="Brawl Stars CYBER", page_icon="🔱", layout="wide")
+st.set_page_config(page_title="Brawl Stars HARDCORE", page_icon="⏳", layout="wide")
 
-# --- 2. ELITE CYBER BACKGROUND & CSS ---
+# --- 2. ELITE CYBER CSS ---
 st.markdown("""
     <style>
     .stApp {
         background: radial-gradient(circle at center, #001220 0%, #000000 100%);
-        background-attachment: fixed;
-        color: #00ffcc;
-        font-family: 'Orbitron', sans-serif;
-    }
-    .stApp::before {
-        content: "";
-        position: fixed;
-        top: 0; left: 0; width: 100%; height: 100%;
-        background: linear-gradient(rgba(0, 255, 204, 0.05) 1px, transparent 1px),
-                    linear-gradient(90deg, rgba(0, 255, 204, 0.05) 1px, transparent 1px);
-        background-size: 50px 50px;
-        z-index: -1;
+        background-attachment: fixed; color: #00ffcc; font-family: 'Orbitron', sans-serif;
     }
     .status-bar {
-        background: rgba(0, 0, 0, 0.8);
-        border: 2px solid #00ffcc;
-        border-radius: 50px; padding: 15px;
-        display: flex; justify-content: space-around;
-        box-shadow: 0 0 20px rgba(0, 255, 204, 0.4);
-        margin-bottom: 30px;
+        background: rgba(0, 0, 0, 0.8); border: 2px solid #00ffcc;
+        border-radius: 50px; padding: 15px; display: flex; justify-content: space-around;
+        box-shadow: 0 0 20px rgba(0, 255, 204, 0.4); margin-bottom: 30px;
     }
     .box-card {
-        background: rgba(10, 10, 10, 0.9);
-        border: 2px solid #333; border-radius: 20px;
-        padding: 20px; text-align: center;
+        background: rgba(10, 10, 10, 0.9); border: 2px solid #333;
+        border-radius: 20px; padding: 20px; text-align: center;
         transition: 0.4s; margin-bottom: 15px;
     }
-    .box-card:hover { border-color: #ff0055; transform: translateY(-5px); }
+    .event-card {
+        background: linear-gradient(135deg, #ff0055 0%, #6200ff 100%);
+        border: 3px solid #fff; border-radius: 20px; padding: 20px;
+        text-align: center; box-shadow: 0 0 30px rgba(255, 0, 85, 0.6);
+    }
+    .small-timer { font-size: 10px; color: #eee; opacity: 0.8; }
     .brawler-card {
         background: #050505; border: 1px solid #00ffcc;
         border-radius: 15px; padding: 15px; text-align: center;
     }
     .rank-badge {
-        background: #cd7f32; color: white;
-        padding: 2px 8px; border-radius: 5px;
-        font-size: 10px; font-weight: bold;
-    }
-    .pass-panel {
-        background: rgba(10, 0, 30, 0.8);
-        border: 2px solid #6200ff; border-radius: 25px;
-        padding: 20px;
+        background: #cd7f32; color: white; padding: 2px 8px; border-radius: 5px; font-size: 10px;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -72,66 +56,42 @@ BRAWLERS_DB = {
     "Мортис": {"pwr": 500, "icon": "🦇", "rank": "BRONZE III"}
 }
 
-PASS_TIERS = {
-    1: {"xp": 500, "reward": "1,000 Золота", "val": 1000, "type": "gold"},
-    5: {"xp": 15000, "reward": "100 Гемов", "val": 100, "type": "gems"},
-    10: {"xp": 100000, "reward": "PLUS: 50,000 Золота", "val": 50000, "type": "gold"},
-    15: {"xp": 400000, "reward": "ФИНАЛ: 400,000 ЗОЛОТА", "val": 400000, "type": "gold"}
-}
-
 # --- 4. SECURE DATA FUNCTIONS ---
 def get_save_code():
-    data = {
-        "gold": st.session_state.gold,
-        "gems": st.session_state.gems,
-        "trophies": st.session_state.trophies,
-        "xp": st.session_state.xp,
-        "inv": st.session_state.inv,
-        "claimed": st.session_state.claimed,
-        "plus": st.session_state.plus
-    }
-    # JSON orqali xavfsiz formatlash
-    json_str = json.dumps(data)
-    return base64.b64encode(json_str.encode()).decode()
+    data = {k: v for k, v in st.session_state.items() if k != 'save_code'}
+    return base64.b64encode(json.dumps(data).encode()).decode()
 
 def load_from_code(code):
     try:
-        decoded_bytes = base64.b64decode(code)
-        data = json.loads(decoded_bytes.decode())
-        # Ma'lumotlarni yangilash
-        for key, value in data.items():
-            st.session_state[key] = value
-        st.success("✅ ДАННЫЕ УСПЕШНО ЗАГРУЖЕНЫ!")
-        time.sleep(1)
-        st.rerun()
-    except Exception as e:
-        st.error(f"❌ ОШИБКА КОДА: {str(e)}")
+        data = json.loads(base64.b64decode(code).decode())
+        for k, v in data.items(): st.session_state[k] = v
+        st.success("✅ ДАННЫЕ ЗАГРУЖЕНЫ!"); time.sleep(0.5); st.rerun()
+    except: st.error("❌ ОШИБКА КОДА!")
 
-def open_box(cost, chance):
+def open_box(cost, chance, is_mega=False):
     if st.session_state.gold >= cost:
         st.session_state.gold -= cost
-        with st.spinner("📦 ОТКРЫТИЕ..."):
-            time.sleep(0.5)
+        with st.spinner("⏳ СИНХРОНИЗАЦИЯ..."):
+            time.sleep(1) # Ochilishni biroz sekinlashtirdik (qiyinlik uchun)
             if random.random() < chance:
                 name = random.choice(list(BRAWLERS_DB.keys()))
                 if name not in st.session_state.inv:
                     st.session_state.inv[name] = BRAWLERS_DB[name]
-                    st.balloons()
-                    st.success(f"🔥 НОВЫЙ БОЕЦ: {name}!")
+                    st.balloons(); st.success(f"🔥 УЛЬТРА РЕДКИЙ: {name}!")
                 else:
-                    st.session_state.gold += (cost * 2)
-                    st.info(f"💰 ДУБЛИКАТ! +{cost*2} Золота")
+                    refund = cost * 1.5 if is_mega else cost * 2
+                    st.session_state.gold += int(refund)
+                    st.info(f"💰 ДУБЛИКАТ! Возвращено: {int(refund)}")
             else:
-                gain = random.randint(int(cost*0.5), int(cost*0.9))
+                gain = random.randint(int(cost*0.3), int(cost*0.6))
                 st.session_state.gold += gain
                 st.toast(f"📦 +{gain} ЗОЛОТА")
     else:
         st.error("НЕДОСТАТОЧНО ЗОЛОТА!")
 
 # --- 5. UI LAYOUT ---
-st.markdown("<h1 style='text-align: center; color: #00ffcc;'>🔱 BRAWL STARS: ELITE CYBER v18.6 🔱</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color: #00ffcc;'>🔱 BRAWL STARS: HARDCORE v18.7 🔱</h1>", unsafe_allow_html=True)
 
-# Status Bar
 st.markdown(f"""
     <div class="status-bar">
         <span style="color: #f1c40f;">💰 ЗОЛОТО: {st.session_state.gold:,}</span>
@@ -144,34 +104,44 @@ col_shop, col_arena, col_pass = st.columns([1, 1, 1.4])
 
 with col_shop:
     st.header("🛒 SHOP")
+    
+    # MEGA ULTRA EVENT BOX
+    st.markdown("""
+        <div class='event-card'>
+            <span class='small-timer'>ОСТАЛОСЬ: 24 ЧАСА</span>
+            <h3>💎 MEGA ULTRA BOX</h3>
+            <p>10,000 ЗОЛОТА</p>
+            <small>Шанс на бойца: 60%</small>
+        </div>
+        """, unsafe_allow_html=True)
+    if st.button("ОТКРЫТЬ EVENT BOX (10,000)", use_container_width=True):
+        open_box(10,000, 0.60, is_mega=True); st.rerun()
+    
+    st.write("---")
     for cost, name, color in [(500, "SMALL", "#333"), (1000, "BIG", "#00d2ff"), (3000, "ULTRA", "#ff0055")]:
-        st.markdown(f"<div class='box-card' style='border-color: {color};'><h3>{name} BOX</h3><p>{cost} ЗОЛОТА</p></div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='box-card' style='border-color: {color};'><h3>{name} BOX</h3><p>{cost}</p></div>", unsafe_allow_html=True)
         if st.button(f"ОТКРЫТЬ {name}", key=f"b_{cost}", use_container_width=True):
-            open_box(cost, 0.05 if cost == 500 else (0.15 if cost == 1000 else 0.35))
+            open_box(cost, 0.04 if cost == 500 else (0.12 if cost == 1000 else 0.25))
             st.rerun()
 
 with col_arena:
     st.header("⚔️ ARENA")
-    if st.button("🔥 START SUPREME BATTLE", use_container_width=True, type="primary"):
-        st.session_state.gold += 300
-        st.session_state.xp += 1500
-        st.session_state.trophies += 25
+    st.warning("Сложность: ВЫСОКАЯ (Награда снижена)")
+    if st.button("🔥 START HARD BATTLE", use_container_width=True, type="primary"):
+        # MUKOFOTLARNI QIYINLASHTIRDIK
+        st.session_state.gold += 100 # Oldin 300 edi
+        st.session_state.xp += 600   # Oldin 1500 edi
+        st.session_state.trophies += 12
+        st.toast("Тяжелая победа! +100 Золота")
         st.rerun()
     
     st.write("---")
     st.subheader("💾 DATA CENTER")
-    if st.button("GENERATE SAVE CODE", use_container_width=True):
-        code = get_save_code()
-        st.code(code)
-        st.info("👆 Скопируйте этот код полностью!")
-
-    input_code = st.text_input("PASTE LOAD CODE:", placeholder="Вставьте код сюда...")
-    if st.button("LOAD PROGRESS", use_container_width=True):
-        if input_code:
-            load_from_code(input_code)
+    if st.button("GENERATE SAVE CODE"): st.code(get_save_code())
+    input_code = st.text_input("PASTE LOAD CODE:")
+    if st.button("LOAD PROGRESS"): load_from_code(input_code)
 
 with col_pass:
-    st.markdown("<div class='pass-panel'>", unsafe_allow_html=True)
     st.header("🎫 BRAWL PASS")
     st.write(f"XP: **{st.session_state.xp:,} / 400,000**")
     st.progress(min(st.session_state.xp / 400000, 1.0))
@@ -180,40 +150,24 @@ with col_pass:
         if st.button("BUY PLUS (200 💎)", use_container_width=True):
             if st.session_state.gems >= 200:
                 st.session_state.gems -= 200
-                st.session_state.plus = True
-                st.rerun()
+                st.session_state.plus = True; st.rerun()
 
-    for t, d in PASS_TIERS.items():
-        is_plus = t >= 10
+    for t in [1, 5, 10, 15]:
+        d = {1: "1,000 Зол", 5: "100 Гем", 10: "50k Зол", 15: "400k ЗОЛОТА"}[t]
+        unlocked = st.session_state.xp >= {1:500, 5:15000, 10:100000, 15:400000}[t]
         claimed = t in st.session_state.claimed
-        unlocked = st.session_state.xp >= d['xp']
-        status = "✅" if claimed else ("🎁" if unlocked else "🔒")
-        
-        st.markdown(f"<div style='padding: 8px; border-bottom: 1px solid #333;'>Tier {t}: {d['reward']} {status}</div>", unsafe_allow_html=True)
-        
+        st.write(f"Tier {t}: {d} {'✅' if claimed else ('🔓' if unlocked else '🔒')}")
         if unlocked and not claimed:
-            if is_plus and not st.session_state.plus:
-                st.button("PLUS REQ", key=f"l_{t}", disabled=True, use_container_width=True)
-            else:
-                if st.button(f"GET {t}", key=f"c_{t}", use_container_width=True):
-                    if d['type'] == 'gold': st.session_state.gold += d['val']
-                    elif d['type'] == 'gems': st.session_state.gems += d['val']
-                    st.session_state.claimed.append(t)
-                    st.rerun()
-    st.markdown("</div>", unsafe_allow_html=True)
+            if t >= 10 and not st.session_state.plus: st.button("NEED PLUS", key=f"l_{t}", disabled=True)
+            elif st.button(f"GET TIER {t}", key=f"c_{t}"):
+                vals = {1:1000, 5:100, 10:50000, 15:400000}
+                if t == 5: st.session_state.gems += vals[t]
+                else: st.session_state.gold += vals[t]
+                st.session_state.claimed.append(t); st.rerun()
 
 st.write("---")
 st.header("👤 MY BRAWLERS")
 b_cols = st.columns(5)
 for i, (name, data) in enumerate(st.session_state.inv.items()):
     with b_cols[i % 5]:
-        st.markdown(f"""
-            <div class='brawler-card'>
-                <div class='rank-badge'>{data.get('rank', 'BRONZE I')}</div>
-                <h2>{data['icon']}</h2>
-                <b>{name}</b>
-            </div>
-            """, unsafe_allow_html=True)
-
-if st.sidebar.button("♻️ RESET"):
-    st.session_state.clear(); st.rerun()
+        st.markdown(f"<div class='brawler-card'><div class='rank-badge'>{data.get('rank','BRONZE I')}</div><h2>{data['icon']}</h2><b>{name}</b></div>", unsafe_allow_html=True)
