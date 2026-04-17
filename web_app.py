@@ -132,4 +132,4 @@ with col_shop:
 st.sidebar.title("Меню")
 if st.sidebar.button("Сбросить прогресс 🔄"):
     st.session_state.clear()
-    st.
+    st.rerun()
