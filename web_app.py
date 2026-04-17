@@ -134,4 +134,19 @@ with col_right:
                 st.subheader(house['name'])
                 st.write(f"Цена: **{house['price']:,} $**")
                 st.write(f"Доход: **+{house['income']}$/сек**")
-                if st.button(f"Купить {
+                if st.button(f"Купить {house['name']}", key=f"buy_{house['id']}"):
+                    if st.session_state.money >= house['price']:
+                        st.session_state.money -= house['price']
+                        st.session_state.inventory_list.append(house)
+                        st.session_state.passive += house['income']
+                        st.snow()
+                        st.rerun()
+                    else:
+                        st.error("Недостаточно денег!")
+                st.markdown("</div>", unsafe_allow_html=True)
+
+# Сброс игры
+st.sidebar.title("Настройки")
+if st.sidebar.button("Начать игру заново"):
+    st.session_state.clear()
+    st.rerun()
