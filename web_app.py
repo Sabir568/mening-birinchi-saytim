@@ -5,133 +5,88 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Точка Доступних Цін</title>
     <style>
-        /* Umumiy sozlamalar */
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f0f2f5;
+            background-color: #f4f7f6;
+            text-align: center;
         }
-
-        /* Ukraina uslubidagi Banner */
-        .hero-section {
+        header {
             background: linear-gradient(135deg, #0057b7 50%, #ffd700 50%);
             color: white;
-            padding: 80px 20px;
-            text-align: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            padding: 60px 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
-
-        .hero-section h1 {
-            margin: 0;
-            font-size: 45px;
-            text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
-        }
-
-        .hero-section p {
-            font-size: 20px;
-            margin-top: 15px;
-            font-weight: bold;
-            color: #fff;
-            background: rgba(0,0,0,0.2);
-            display: inline-block;
-            padding: 10px 20px;
-            border-radius: 50px;
-        }
-
-        /* Katalog */
-        .shop-container {
-            max-width: 1100px;
-            margin: 50px auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 25px;
-            padding: 0 20px;
-        }
-
-        /* Katalog kartalari */
-        .category-card {
-            background: white;
-            border-radius: 15px;
-            padding: 30px 15px;
-            text-align: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            transition: transform 0.3s ease;
-            border-bottom: 5px solid #0057b7;
-        }
-
-        .category-card:hover {
-            transform: translateY(-10px);
-        }
-
-        .icon {
-            font-size: 50px;
-            margin-bottom: 20px;
-            display: block;
-        }
-
-        .category-card h2 {
-            font-size: 24px;
+        h1 { margin: 0; font-size: 3rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        .welcome-msg {
+            background: rgba(255,255,255,0.9);
             color: #333;
-            margin: 10px 0;
-        }
-
-        .category-card p {
-            color: #ff4757;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 800px;
+            border-radius: 10px;
             font-weight: bold;
-            font-size: 14px;
-            text-transform: uppercase;
         }
-
-        /* Pastki qism */
-        footer {
-            text-align: center;
+        .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
             padding: 40px;
-            background: #333;
-            color: #ccc;
-            margin-top: 50px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            border-bottom: 6px solid #0057b7;
+        }
+        .icon { font-size: 50px; display: block; margin-bottom: 15px; }
+        h2 { color: #0057b7; margin: 10px 0; }
+        .status { color: #e74c3c; font-weight: bold; font-size: 0.9rem; }
+        footer { background: #222; color: #aaa; padding: 30px; margin-top: 50px; }
     </style>
 </head>
 <body>
 
-    <div class="hero-section">
-        <h1>Точка Доступних Цін</h1>
-        <p>Ласкаво просимо! Найкраща якість за доступною ціною.</p>
+<header>
+    <h1>Точка Доступних Цін</h1>
+    <p>Доступні ціни для кожного українця!</p>
+</header>
+
+<div class="welcome-msg">
+    Ласкаво просимо! Ми працюємо над заповненням нашого каталогу.
+</div>
+
+<div class="container">
+    <div class="card">
+        <span class="icon">👟</span>
+        <h2>Взуття</h2>
+        <p class="status">Фото з'являться незабаром</p>
     </div>
-
-    <div class="shop-container">
-        
-        <div class="category-card">
-            <span class="icon">👟</span>
-            <h2>Взуття</h2>
-            <p>Фото з'являться незабаром</p>
-        </div>
-
-        <div class="category-card">
-            <span class="icon">👕</span>
-            <h2>Одяг</h2>
-            <p>Фото з'являться незабаром</p>
-        </div>
-
-        <div class="category-card">
-            <span class="icon">👙</span>
-            <h2>Білизна</h2>
-            <p>Фото з'являться незабаром</p>
-        </div>
-
-        <div class="category-card">
-            <span class="icon">👜</span>
-            <h2>Сумки</h2>
-            <p>Фото з'являться незабаром</p>
-        </div>
-
+    <div class="card">
+        <span class="icon">👕</span>
+        <h2>Одяг</h2>
+        <p class="status">Фото з'являться незабаром</p>
     </div>
+    <div class="card">
+        <span class="icon">👙</span>
+        <h2>Білизна</h2>
+        <p class="status">Фото з'являться незабаром</p>
+    </div>
+    <div class="card">
+        <span class="icon">👜</span>
+        <h2>Сумки</h2>
+        <p class="status">Фото з'являться незабаром</p>
+    </div>
+</div>
 
-    <footer>
-        <p>&copy; 2026 Точка Доступних Цін. Всі права захищені.</p>
-        <p style="color: #ffd700;">Скоро відкриття асортименту!</p>
-    </footer>
+<footer>
+    <p>&copy; 2026 Точка Доступних Цін. Всі права захищені.</p>
+    <p style="color: #ffd700;">Україна - Попереду відкриття!</p>
+</footer>
 
 </body>
 </html>
