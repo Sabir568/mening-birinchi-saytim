@@ -3,89 +3,230 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Точка Доступних Цін</title>
+    <title>Точка Доступних Цін - Магазин одягу</title>
     <style>
+        /* Asosiy dizayn sozlamalari */
         body {
-            font-family: 'Segoe UI', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f7f6;
+            font-family: 'Montserrat', sans-serif, Arial;
+            background-color: #000000; /* Rasmdagi kabi qora fon */
+            color: #ffffff;
+            line-height: 1.6;
+        }
+
+        /* Yuqori qism (Header) */
+        header {
+            padding: 40px 20px;
             text-align: center;
         }
-        header {
-            background: linear-gradient(135deg, #0057b7 50%, #ffd700 50%);
-            color: white;
-            padding: 60px 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+
+        .logo-container {
+            background-color: #ffffff;
+            display: inline-block;
+            padding: 15px 30px;
+            border-radius: 50px;
+            margin-bottom: 20px;
         }
-        h1 { margin: 0; font-size: 3rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
-        .welcome-msg {
-            background: rgba(255,255,255,0.9);
-            color: #333;
-            padding: 20px;
-            margin: 20px auto;
-            max-width: 800px;
-            border-radius: 10px;
+
+        .logo-text {
+            color: #000;
+            font-weight: 900;
+            font-size: 2.5rem;
+            text-transform: uppercase;
+        }
+
+        .logo-text span {
+            color: #e61e25; /* Qizil "ТОЧКА" */
+        }
+
+        .sub-logo {
+            color: #000;
+            display: block;
+            font-size: 1.1rem;
+            margin-top: -5px;
+        }
+
+        /* Do'kon ma'lumotlari */
+        .info-section {
+            margin-bottom: 40px;
+        }
+
+        .shop-title {
+            color: #e61e25;
+            font-size: 1.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .working-hours {
+            font-size: 1.4rem;
+            margin: 10px 0;
+        }
+
+        .no-days-off {
+            color: #e61e25;
+            font-style: italic;
             font-weight: bold;
         }
+
+        .slogan {
+            font-family: 'Brush Script MT', cursive, serif; /* Qo'lyozma uslubi */
+            font-size: 1.5rem;
+            margin-top: 20px;
+            color: #f0f0f0;
+        }
+
+        /* Mahsulotlar bo'limi (Grid) */
         .container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            padding: 40px;
-            max-width: 1200px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            padding: 20px;
+            max-width: 1100px;
             margin: 0 auto;
         }
-        .card {
-            background: white;
+
+        .category-card {
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 20px;
             padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-            border-bottom: 6px solid #0057b7;
+            text-align: center;
+            transition: transform 0.3s ease;
         }
-        .icon { font-size: 50px; display: block; margin-bottom: 15px; }
-        h2 { color: #0057b7; margin: 10px 0; }
-        .status { color: #e74c3c; font-weight: bold; font-size: 0.9rem; }
-        footer { background: #222; color: #aaa; padding: 30px; margin-top: 50px; }
+
+        .category-card:hover {
+            transform: translateY(-10px);
+            border-color: #e61e25;
+        }
+
+        .icon-circle {
+            width: 120px;
+            height: 120px;
+            background-color: #ffffff;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .icon-circle img {
+            width: 70%;
+            height: auto;
+            filter: invert(0); /* Ikonkalar qora rangda */
+        }
+
+        .category-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .category-name::before, .category-name::after {
+            content: " • ";
+            color: #e61e25;
+        }
+
+        /* Manzil qismi */
+        .address-footer {
+            margin-top: 50px;
+            padding: 40px 20px;
+            background-color: #0a0a0a;
+            border-top: 1px solid #333;
+        }
+
+        .location-name {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .fora-text {
+            color: #e61e25;
+            font-weight: bold;
+        }
+
+        .copyright {
+            color: #666;
+            font-size: 0.8rem;
+            margin-top: 20px;
+        }
+
+        /* Tugmalar uchun */
+        .btn-view {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: #e61e25;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>Точка Доступних Цін</h1>
-    <p>Доступні ціни для кожного українця!</p>
+    <div class="logo-container">
+        <div class="logo-text"><span>Т</span>ОЧКА</div>
+        <span class="sub-logo">доступних цін</span>
+    </div>
+
+    <div class="info-section">
+        <div class="shop-title">Магазин одягу</div>
+        <div class="working-hours">працюємо з 10:00 до 19:00</div>
+        <div class="no-days-off">без вихідних</div>
+        <div class="slogan">Завітай - одягнемо всю родину, <br> по доступним цінам!</div>
+    </div>
 </header>
 
-<div class="welcome-msg">
-    Ласкаво просимо! Ми працюємо над заповненням нашого каталогу.
+<div class="container">
+    <div class="category-card">
+        <div class="icon-circle">
+            <img src="https://cdn-icons-png.flaticon.com/512/2851/2851167.png" alt="Взуття">
+        </div>
+        <div class="category-name">Взуття</div>
+        <a href="#" class="btn-view">Дивитись товари</a>
+    </div>
+
+    <div class="category-card">
+        <div class="icon-circle">
+            <img src="https://cdn-icons-png.flaticon.com/512/3534/3534312.png" alt="Одяг">
+        </div>
+        <div class="category-name">Одяг</div>
+        <a href="#" class="btn-view">Дивитись товари</a>
+    </div>
+
+    <div class="category-card">
+        <div class="icon-circle">
+            <img src="https://cdn-icons-png.flaticon.com/512/3144/3144865.png" alt="Білизна">
+        </div>
+        <div class="category-name">Білизна</div>
+        <a href="#" class="btn-view">Дивитись товари</a>
+    </div>
+
+    <div class="category-card">
+        <div class="icon-circle">
+            <img src="https://cdn-icons-png.flaticon.com/512/2652/2652218.png" alt="Сумки">
+        </div>
+        <div class="category-name">Сумки</div>
+        <a href="#" class="btn-view">Дивитись товари</a>
+    </div>
 </div>
 
-    <div class="card">
-    <img src="vzuttya1.jpg" alt="Vzuttya" style="width:100%; border-radius:10px;">
-    <h2>Взуття</h2>
-    <p style="color: #2ecc71; font-weight: bold;">В наявності</p>
-</div>
-    
-    <div class="card">
-        <span class="icon">👕</span>
-        <h2>Одяг</h2>
-        <p class="status">Фото з'являться незабаром</p>
+<footer class="address-footer">
+    <div class="location-name">
+        Магазин <span class="fora-text">«ФОРА»</span> 2-ий поверх
     </div>
-    <div class="card">
-        <span class="icon">👙</span>
-        <h2>Білизна</h2>
-        <p class="status">Фото з'являться незабаром</p>
+    <div class="address-detail">
+        Чернігівська вулиця, 12, Калинівка
     </div>
-    <div class="card">
-        <span class="icon">👜</span>
-        <h2>Сумки</h2>
-        <p class="status">Фото з'являться незабаром</p>
-    </div>
-</div>
-
-<footer>
-    <p>&copy; 2026 Точка Доступних Цін. Всі права захищені.</p>
-    <p style="color: #ffd700;">Україна - Попереду відкриття!</p>
+    <p class="copyright">&copy; 2026 Точка Доступних Цін. Всі права захищені.</p>
 </footer>
 
 </body>
+</html>
